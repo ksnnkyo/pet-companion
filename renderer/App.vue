@@ -18,6 +18,7 @@ import { usePersonalityStore } from './stores/personalityStore';
 import { useEmotionBrain } from './stores/emotionBrain';
 import { useMemoryStore } from './stores/memoryStore';
 import { useVariablesStore } from './stores/variablesStore';
+import { useCharacterStore } from './stores/characterStore';
 import { useBubble } from './composables/useBubble';
 import { useDrag } from './composables/useDrag';
 
@@ -29,6 +30,7 @@ const audioStore = useAudioStore();
 const personalityStore = usePersonalityStore();
 const memoryStore = useMemoryStore();
 const variablesStore = useVariablesStore();
+const characterStore = useCharacterStore();
 const brain = useEmotionBrain();
 
 const petView = ref(null);
@@ -59,6 +61,9 @@ onMounted(async () => {
   await personalityStore.load();
   await memoryStore.load();
   await variablesStore.load();
+  await characterStore.load();
+  // 默认激活第一个伴侣（同步人格等全局状态）
+  if (characterStore.activeId) await characterStore.activate(characterStore.activeId);
   await audioStore.init();
   soulStore.loadSoul();
   brain.init();
@@ -100,6 +105,7 @@ function handlePetAction(data) {
   if (text) bubble.show(text, false);
   window.electronAPI?.send('pet-event', { type: 'clicked', data: { action: data.action, zone: data.zone } });
   variablesStore.onUserClick();
+  characterStore.logInteraction(data.action, `${data.action} ${data.zone || ''}`, emotion);
 }
 
 function onPetClick(event) {
@@ -108,6 +114,7 @@ function onPetClick(event) {
   const zone = rect && event.clientY - rect.top < 80 ? 'head' : 'body';
   petStore.triggerEmotion(zone === 'head' ? 'affectionate' : 'happy', 'mild');
   bubble.show(petStore.getRandomDialogue() || '', false);
+  characterStore.logInteraction('click', `摸了${zone === 'head' ? '头' : '身体'}`, 'affectionate');
 }
 
 async function sendBubbleMessage(text) {
@@ -125,6 +132,7 @@ async function sendBubbleMessage(text) {
   try {
     const reply = await agentStore.sendMessage(text, { emotion: petStore.currentEmotion, intensity: petStore.currentIntensity });
     brain.context.conversation.push({ role: 'assistant', content: reply });
+    characterStore.logInteraction('chat', text, petStore.currentEmotion, { reply: reply?.slice(0, 50) });
     if (brain.context.conversation.length > 20) brain.context.conversation.shift();
     bubble.show(reply, false);
   } catch {

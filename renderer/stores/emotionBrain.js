@@ -3,6 +3,7 @@ import { useSoulStore } from './soulStore';
 import { usePersonalityStore } from './personalityStore';
 import { useMemoryStore } from './memoryStore';
 import { useVariablesStore } from './variablesStore';
+import { useCharacterStore } from './characterStore';
 
 export const useEmotionBrain = defineStore('emotionBrain', {
   state: () => ({
@@ -98,11 +99,13 @@ export const useEmotionBrain = defineStore('emotionBrain', {
       const hour = new Date().getHours();
       const timeDesc = hour < 6 ? '深夜' : hour < 9 ? '早晨' : hour < 12 ? '上午' : hour < 14 ? '中午' : hour < 18 ? '下午' : hour < 22 ? '晚上' : '深夜';
 
-      // 注入记忆和变量
+      // 注入记忆、变量、角色上下文
       const ms = useMemoryStore();
       const vs = useVariablesStore();
+      const cs = useCharacterStore();
       const memCtx = ms.allContext();
       const varCtx = vs.promptContext();
+      const charCtx = cs.getCharacterContext();
 
       return [
         '你是桌面宠物"小伴"的情绪引擎。你的任务是：根据当前上下文，决定宠物应该展示什么情绪和说什么话。',
@@ -126,6 +129,7 @@ export const useEmotionBrain = defineStore('emotionBrain', {
         '## 最近事件',
         ...c.recentEvents.slice(-5).map(e => `- ${e.type}: ${JSON.stringify(e.data)}`),
         '',
+        charCtx,
         memCtx ? `## 记忆\n${memCtx}` : '',
         varCtx ? `## 关系状态\n${varCtx}` : '',
         '',

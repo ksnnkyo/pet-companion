@@ -5,11 +5,13 @@ const fs = require('fs');
 let mainWindow = null;
 let chatWindow = null;
 let settingsWindow = null;
+let companionEditor = null;
 let tray = null;
 
 const W = 200, H = 240;           // 主窗口
 const CW = 380, CH = 520;         // 聊天窗口
 const SW = 420, SH = 600;         // 设置窗口
+const EW = 500, EH = 700;         // 伴侣编辑窗口
 const HEART = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAYAAACEYr13AAAAPElEQVR4nGNgQAP/gQBdjBg5sCQpgCLNGIaMGkAFAyiORqoYQIohOFMjMYbg1UzIEKI04zKEJM2jgM4AAAY9VccO2D9MAAAAAElFTkSuQmCC';
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
@@ -108,6 +110,31 @@ function createMenuBar() {
   ]));
 }
 
-function getWindows() { return { mainWindow, chatWindow, settingsWindow, tray }; }
+function createCompanionEditor(companionData) {
+  if (companionEditor && !companionEditor.isDestroyed()) { companionEditor.show(); companionEditor.focus(); return companionEditor; }
+  const wa = screen.getPrimaryDisplay().workArea;
+  companionEditor = new BrowserWindow({
+    width: EW, height: EH,
+    x: Math.round(wa.x + (wa.width - EW) / 2),
+    y: Math.round(wa.y + (wa.height - EH) / 2),
+    show: true, title: '编辑伴侣', resizable: true, minimizable: false,
+    webPreferences: { nodeIntegration: false, contextIsolation: true, preload: path.join(__dirname, 'preload.js') },
+  });
+  const file = path.join(__dirname, '../renderer/companion-editor.html');
+  companionEditor.loadFile(file).catch(e => console.error('Editor load failed:', e));
+  companionEditor.on('closed', () => { companionEditor = null; });
+  // 编辑器就绪后发送数据
+  const ipc = require('electron').ipcMain;
+  const onReady = (_e) => {
+    if (companionEditor && !companionEditor.isDestroyed()) {
+      companionEditor.webContents.send('companion-data', companionData || {});
+    }
+  };
+  ipc.once('companion-editor-ready', onReady);
+  companionEditor.on('closed', () => { ipc.removeListener('companion-editor-ready', onReady); });
+  return companionEditor;
+}
 
-module.exports = { createMainWindow, createChatWindow, createSettingsWindow, createTray, createMenuBar, getWindows, placeWindow, W, H };
+function getWindows() { return { mainWindow, chatWindow, settingsWindow, companionEditor, tray }; }
+
+module.exports = { createMainWindow, createChatWindow, createSettingsWindow, createCompanionEditor, createTray, createMenuBar, getWindows, placeWindow, W, H };

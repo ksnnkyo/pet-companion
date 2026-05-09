@@ -10,6 +10,7 @@ import { usePetStore } from '../stores/petStore';
 import { useSoulStore } from '../stores/soulStore';
 import { useAgentStore } from '../stores/agentStore';
 import { useEmotionBrain } from '../stores/emotionBrain';
+import { useCharacterStore } from '../stores/characterStore';
 
 const petStore = usePetStore();
 const soulStore = useSoulStore();
@@ -19,6 +20,12 @@ const containerRef = ref(null);
 const canvasRef = ref(null);
 const canvasWidth = ref(200);
 const canvasHeight = ref(240);
+
+// 精灵图模式
+const spriteImage = ref(null);
+const spritesheetConfig = ref(null);
+const emotionColumnMap = { idle:0, affectionate:1, shy:2, happy:3, sad:4, angry:5, lonely:6, excited:7, sleepy:8, dazed:9, curious:10, proud:11, comforting:12, wronged:13, surprised:14 };
+const intensityRowMap = { mild:0, medium:1, intense:2 };
 
 let animationTimer = null;
 let frameIndex = 0;
@@ -416,8 +423,37 @@ function drawFrame() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+
   const emotion = petStore.currentEmotion || 'idle';
-  const p = P[emotion] || P.idle;
+  const intensity = petStore.currentIntensity || 'mild';
+
+  // ===== 精灵图模式 =====
+  const config = spritesheetConfig.value;
+  if (config && spriteImage.value) {
+    const col = (config.mapping?.[emotion] !== undefined) ? config.mapping[emotion] : emotionColumnMap[emotion];
+    const row = intensityRowMap[intensity] || 0;
+    const cw = config.cellWidth || 192;
+    const ch = config.cellHeight || 192;
+    const sx = (col !== undefined ? col : 0) * cw;
+    const sy = (row !== undefined ? row : 0) * ch;
+    const dx = Math.round((canvasWidth.value - cw) / 2);
+    const dy = Math.round((canvasHeight.value - ch) / 2);
+
+    if (facing === 'left') {
+      ctx.save(); ctx.translate(canvasWidth.value, 0); ctx.scale(-1, 1);
+      ctx.drawImage(spriteImage.value, sx, sy, cw, ch, canvasWidth.value - dx - cw, dy, cw, ch);
+      ctx.restore();
+    } else {
+      ctx.drawImage(spriteImage.value, sx, sy, cw, ch, dx, dy, cw, ch);
+    }
+    return;
+  }
+
+  // ===== 程序化绘制模式 =====
+  const baseP = P[emotion] || P.idle;
+  const cs = useCharacterStore();
+  const charPalette = cs.current?.palette || {};
+  const p = { ...baseP, ...charPalette };
   if (facing === 'left') { ctx.save(); ctx.translate(canvasWidth.value, 0); ctx.scale(-1, 1); }
   // 以 512×640 坐标系绘制，缩放适配画布，顶部留 40px 给气泡
   const s = canvasWidth.value / 512;
@@ -468,7 +504,14 @@ function drawFrame() {
 watch(() => petStore.currentEmotion, () => { frameIndex = 0; startLoop(); });
 function setFacing(dir) { facing = dir; }
 function getBounds() { return containerRef.value?.getBoundingClientRect() || null; }
-defineExpose({ getBounds, setFacing, startLoop, stopLoop });
+function loadSpritesheet(config) {
+  if (!config?.file) { spritesheetConfig.value = null; spriteImage.value = null; return; }
+  spritesheetConfig.value = config;
+  const img = new Image();
+  img.onload = () => { spriteImage.value = img; };
+  img.src = config.file;
+}
+defineExpose({ getBounds, setFacing, startLoop, stopLoop, loadSpritesheet });
 </script>
 
 <style scoped>

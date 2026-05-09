@@ -75,4 +75,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
   removeAgentContextListener: (callback) => {
     ipcRenderer.removeListener('agent-context', callback);
   },
+  onCompanionChanged: (callback) => {
+    ipcRenderer.on('companion-changed', (_e, data) => callback(data));
+  },
+  removeCompanionChangedListener: (callback) => {
+    ipcRenderer.removeListener('companion-changed', callback);
+  },
+  openCompanionEditor: (data) => ipcRenderer.send('open-companion-editor', data),
+  onCompanionData: (callback) => {
+    ipcRenderer.on('companion-data', (_e, data) => callback(data));
+  },
+  onCompanionSaved: (callback) => {
+    ipcRenderer.on('companion-saved', (_e, data) => callback(data));
+  },
+  removeCompanionSavedListener: (callback) => {
+    ipcRenderer.removeListener('companion-saved', callback);
+  },
 });

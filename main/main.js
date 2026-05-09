@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, Menu, screen, powerMonitor, Notification } 
 const path = require('path');
 const log = require('electron-log');
 const { createServer } = require('./httpServer');
-const { createMainWindow, createChatWindow, createSettingsWindow, createTray, createMenuBar, getWindows } = require('./windowManager');
+const { createMainWindow, createChatWindow, createSettingsWindow, createCompanionEditor, createTray, createMenuBar, getWindows } = require('./windowManager');
 
 log.transports.file.level = 'info';
 log.transports.console.level = 'debug';
@@ -61,11 +61,21 @@ function setupIPC() {
     getWindows().mainWindow?.webContents.send('show-bubble', { text });
   });
 
-  // 打开/关闭聊天窗口
+  // 聊天窗口
   ipcMain.on('open-chat-window', createChatWindow);
   ipcMain.on('close-chat-window', () => {
     const cw = getWindows().chatWindow;
     if (cw && !cw.isDestroyed()) cw.close();
+  });
+
+  // 伴侣编辑窗口
+  ipcMain.on('open-companion-editor', (_e, data) => createCompanionEditor(data));
+  ipcMain.on('companion-editor-save', (_e, data) => {
+    getWindows().settingsWindow?.webContents.send('companion-saved', data);
+    getWindows().companionEditor?.close();
+  });
+  ipcMain.on('companion-editor-cancel', () => {
+    getWindows().companionEditor?.close();
   });
 
   // LLM 对话（聊天窗口用）

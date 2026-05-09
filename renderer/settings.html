@@ -41,43 +41,12 @@ button{font-size:12px;padding:6px 12px;border:none;border-radius:6px;cursor:poin
 </head>
 <body>
 <div class="tabs">
-  <div class="tab active" data-panel="personality">🎭 人格</div>
-  <div class="tab" data-panel="memory">🧠 记忆</div>
+  <div class="tab active" data-panel="companion">💕 伴侣</div>
   <div class="tab" data-panel="variables">📊 变量</div>
   <div class="tab" data-panel="llm">🔌 LLM</div>
-  <div class="tab" data-panel="pet">🐾 宠物</div>
 </div>
 
-<!-- 人格 -->
-<div class="panel active" id="panel-personality">
-  <div class="section">
-    <h3>预设</h3>
-    <select id="presetSelect">
-      <option value="">自定义</option>
-      <option value="温柔人妻">温柔人妻</option>
-      <option value="职场御姐">职场御姐</option>
-      <option value="高需求小娇妻">高需求小娇妻</option>
-    </select>
-  </div>
-  <div class="section"><h3>16 维度调节</h3><div id="sliders"></div></div>
-</div>
-
-<!-- 记忆 -->
-<div class="panel" id="panel-memory">
-  <div class="section">
-    <h3>World Info 词条记忆</h3>
-    <p style="font-size:11px;color:#888;margin-bottom:8px">LLM 自动从对话中提取记忆，或手动添加。对话命中关键词时自动注入上下文。</p>
-    <div class="row" style="margin-bottom:8px">
-      <label style="flex:1">关键词<input id="memKeys" placeholder="猫,咪咪"></label>
-      <label style="flex:2">内容<input id="memContent" placeholder="用户养了一只猫"></label>
-    </div>
-    <button class="btn-primary" id="memAdd">添加词条</button>
-    <label style="margin-top:8px"><input type="checkbox" id="memAuto" checked> LLM 自动提取记忆</label>
-  </div>
-  <div class="section"><h3>已存词条 (<span id="memCount">0</span>)</h3><div id="memList"></div></div>
-</div>
-
-<!-- 变量 -->
+<!-- 伴侣 -->
 <div class="panel" id="panel-variables">
   <div class="section"><h3>关系变量</h3><div id="varBars"></div></div>
   <div class="section"><h3>变动记录</h3><div class="var-history" id="varHistory"></div></div>
@@ -104,14 +73,19 @@ button{font-size:12px;padding:6px 12px;border:none;border-radius:6px;cursor:poin
   </div>
 </div>
 
-<!-- 宠物 -->
-<div class="panel" id="panel-pet">
+<!-- 伴侣 -->
+<div class="panel" id="panel-companion">
   <div class="section">
-    <h3>基本信息</h3>
-    <label>名字<input id="petName" placeholder="小伴"></label>
-    <label>基调<input id="petTone" placeholder="温暖治愈"></label>
-    <label>外观描述<textarea id="petAppearance" rows="3" placeholder="温柔知性的女性形象..."></textarea></label>
-    <label>人格描述<textarea id="petPersonality" rows="3" placeholder="细腻、会主动关心用户..."></textarea></label>
+    <h3>伴侣列表</h3>
+    <p style="font-size:11px;color:#888;margin-bottom:8px">一次只能激活一个伴侣。切换伴侣会同步更新人格配置、配色和记忆。</p>
+    <div id="companionList"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn-primary" id="btnNewCompanion">+ 新建伴侣</button>
+      <button class="btn-secondary" id="btnImportCard">导入角色卡</button>
+      <input type="file" id="fileImport" accept=".json" style="display:none">
+    </div>
+    <p style="font-size:10px;color:#aaa;margin-top:4px">点击「编辑」在独立窗口中修改所有属性和人格</p>
+  </div>
   </div>
 </div>
 
@@ -125,47 +99,6 @@ document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
   document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
   t.classList.add('active');$('panel-'+t.dataset.panel).classList.add('active');
 };});
-
-// ===== 人格 =====
-const dims=['extraversion','sensitivity','clinginess','energy','expressiveness','sophistication','sapiosexuality','tolerance','romanticism','equanimity','attachment','possessiveness','libido','dominance','demandingness','maternity'];
-const dimLabels={extraversion:'外向性',sensitivity:'敏感度',clinginess:'粘人性',energy:'活力值',expressiveness:'表达风格',sophistication:'世故度',sapiosexuality:'智性恋',tolerance:'包容度',romanticism:'浪漫vs务实',equanimity:'豁达vs焦虑',attachment:'依恋型',possessiveness:'占有欲',libido:'情欲',dominance:'支配欲',demandingness:'索取度',maternity:'母性'};
-const dimLows={extraversion:'安静',sensitivity:'顿感',clinginess:'独立',energy:'慵懒',expressiveness:'直接',sophistication:'天真',sapiosexuality:'颜值优先',tolerance:'挑剔',romanticism:'浪漫',equanimity:'豁达',attachment:'安全',possessiveness:'佛系',libido:'纯治愈',dominance:'顺从',demandingness:'不提要求',maternity:'讨厌照顾'};
-const dimHighs={extraversion:'主动',sensitivity:'敏感',clinginess:'粘人',energy:'精力旺盛',expressiveness:'含蓄',sophistication:'洞察',sapiosexuality:'才华控',tolerance:'包容',romanticism:'务实',equanimity:'焦虑',attachment:'焦虑型',possessiveness:'占有欲强',libido:'欲望强',dominance:'掌控',demandingness:'高需求',maternity:'照料狂'};
-let personality={}; dims.forEach(d=>personality[d]=50);
-
-function buildSliders(){
-  $('sliders').innerHTML=dims.map(d=>`
-    <div class="slider-row"><span>${dimLabels[d]} <small>${personality[d]}</small></span>
-    <div class="slider-wrap"><span class="slider-low">${dimLows[d]}</span>
-    <input type="range" min="0" max="100" value="${personality[d]}" data-dim="${d}">
-    <span class="slider-high">${dimHighs[d]}</span></div></div>
-  `).join('');
-  document.querySelectorAll('#sliders input').forEach(s=>{s.oninput=()=>{personality[s.dataset.dim]=parseInt(s.value);s.parentElement.parentElement.querySelector('small').textContent=s.value;$('presetSelect').value='';savePersonality();};});
-}
-async function loadPersonality(){const s=await api.getConfig('personality');if(s?.dimensions)Object.assign(personality,s.dimensions);buildSliders();}
-function savePersonality(){api.setConfig('personality',{dimensions:personality,name:$('petName').value||'小伴',tone:$('petTone').value||'温暖治愈'});}
-$('presetSelect').onchange=async()=>{
-  const v=$('presetSelect').value; if(!v)return;
-  const r=await fetch('http://localhost:5173/assets/personality.json');
-  if(r.ok){const d=await r.json();if(d.presets[v]){Object.assign(personality,d.presets[v]);savePersonality();buildSliders();}}
-};
-loadPersonality();
-
-// ===== 记忆 =====
-let memories=[],memAuto=true;
-async function loadMem(){const s=await api.getConfig('memories');if(s?.entries)memories=s.entries;if(s?.autoExtract!==undefined)memAuto=s.autoExtract;$('memAuto').checked=memAuto;renderMem();}
-async function saveMem(){await api.setConfig('memories',{entries:memories,autoExtract:memAuto});}
-function renderMem(){$('memCount').textContent=memories.length;$('memList').innerHTML=memories.map(m=>`<div class="memory-item"><div><div class="keys">${m.keys.join(', ')}</div><div class="content">${m.content}</div></div><div class="actions"><button class="btn-danger btn-sm" data-id="${m.id}">删除</button></div></div>`).join('')||'<div style="color:#aaa;font-size:12px">暂无词条</div>';
-document.querySelectorAll('#memList .btn-danger').forEach(b=>b.onclick=()=>{memories=memories.filter(m=>m.id!==b.dataset.id);saveMem();renderMem();});}
-$('memAdd').onclick=()=>{
-  const keys=$('memKeys').value.split(',').map(k=>k.trim()).filter(Boolean);
-  const content=$('memContent').value.trim();
-  if(!keys.length||!content)return;
-  memories.push({id:Date.now().toString(36),keys,content,createdAt:Date.now(),updatedAt:Date.now(),source:'manual'});
-  saveMem();renderMem();$('memKeys').value='';$('memContent').value='';
-};
-$('memAuto').onchange=()=>{memAuto=$('memAuto').checked;saveMem();};
-loadMem();
 
 // ===== 变量 =====
 let variables={affection:50,trust:50,familiarity:30,energy:70,mood:60},varHistory=[];
@@ -196,12 +129,90 @@ $('temperature').oninput=function(){$('tempVal').textContent=this.value;saveLLM(
 $('thinkInterval').onchange=function(){thinkInterval=parseInt(this.value)||15;api.setConfig('thinkInterval',thinkInterval);};
 loadLLM();
 
-// ===== 宠物 =====
-let profile={name:'小伴',tone:'温暖治愈',appearance:'温柔知性',personality:'细腻会关心人'};
-function loadPet(){const p=api.getConfig('petProfile').then(p=>{if(p)Object.assign(profile,p);$('petName').value=profile.name;$('petTone').value=profile.tone;$('petAppearance').value=profile.appearance;$('petPersonality').value=profile.personality;});}
-function savePet(){profile.name=$('petName').value;profile.tone=$('petTone').value;profile.appearance=$('petAppearance').value;profile.personality=$('petPersonality').value;api.setConfig('petProfile',profile);}
-['petName','petTone','petAppearance','petPersonality'].forEach(id=>$(id).addEventListener('change',savePet));
-loadPet();
+// ===== 伴侣管理 =====
+let companions=[],activeId=null,editingId=null;
+
+async function loadCompanions(){
+  const s=await api.getConfig('characterState');
+  if(s){if(s.companions)companions=s.companions;if(s.activeId)activeId=s.activeId;}
+  if(companions.length===0){
+    const id=Date.now().toString(36);
+    companions.push({id,name:'小伴',archetype:'温柔人妻型',personality:{core:'温柔、细腻、会主动关心人',traits:{extraversion:45,sensitivity:70,clinginess:50,energy:50,expressiveness:65,sophistication:70,sapiosexuality:55,tolerance:75,romanticism:45,equanimity:60,attachment:45,possessiveness:55,libido:50,dominance:20,demandingness:40,maternity:75},speaking_style:''},appearance:{style:'针织衫+长裙'},palette:{dress:'#7eb8a6',dressDark:'#5a9a86',skirt:'#6aaa96',skirtDark:'#4d8a75',accent:'#e8c86e',shoe:'#4a3a30',sole:'#2a1a10'}});
+    activeId=id;
+    await api.setConfig('characterState',{companions,activeId});
+  }
+  if(!activeId)activeId=companions[0].id;
+  renderCompanionList();
+}
+async function saveCompanions(){await api.setConfig('characterState',{companions,activeId});}
+
+function renderCompanionList(){
+  $('companionList').innerHTML=companions.map(c=>{
+    const isActive=c.id===activeId;
+    return `<div class="memory-item" style="border-left:3px solid ${isActive?'#d46a78':'#e0dcd6'}">
+      <div><div style="font-size:13px;font-weight:600">${c.name} ${isActive?'<span style="color:#d46a78;font-size:11px">● 已激活</span>':''}</div>
+      <div style="font-size:11px;color:#888">${c.archetype||''} ${c.personality?.core?.slice(0,20)||''}...</div></div>
+      <div class="actions">
+        ${!isActive?`<button class="btn-primary btn-sm activate-btn" data-id="${c.id}">激活</button>`:''}
+        <button class="btn-secondary btn-sm edit-btn" data-id="${c.id}">编辑</button>
+      </div></div>`;
+  }).join('');
+  document.querySelectorAll('.activate-btn').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.id;
+    activeId=id;
+    // 通知主窗口切换伴侣
+    const c=companions.find(x=>x.id===id);
+    if(c){
+      api.setConfig('characterState',{companions,activeId});
+      // 更新人格
+      if(c.personality?.traits){api.setConfig('personality',{dimensions:c.personality.traits,name:c.name});}
+      // 通知 renderer 刷新
+      api.send('companion-changed',{id,name:c.name,palette:c.palette||{}});
+    }
+    renderCompanionList();
+  });
+  document.querySelectorAll('.edit-btn').forEach(b=>b.onclick=()=>editCompanion(b.dataset.id));
+}
+
+function editCompanion(id){
+  const c=companions.find(x=>x.id===id);
+  if(!c)return;
+  api.openCompanionEditor(c);
+}
+
+$('btnNewCompanion').onclick=()=>{
+  api.openCompanionEditor({id:Date.now().toString(36),name:'新伴侣',personality:{core:'',traits:{},speaking_style:''},appearance:{},palette:{}});
+};
+
+// 接收编辑器保存的数据
+api.onCompanionSaved?.((data)=>{
+  if(!data)return;
+  const idx=companions.findIndex(c=>c.id===data.id);
+  if(idx>=0){
+    companions[idx]={...companions[idx],...data};
+  }else{
+    companions.push(data);
+  }
+  saveCompanions();
+  if(data.id===activeId){
+    api.setConfig('personality',{dimensions:data.personality?.traits||{},name:data.name});
+    api.send('companion-changed',{id:data.id,name:data.name,palette:data.palette,spritesheet:data.spritesheet});
+  }
+  renderCompanionList();
+});
+
+$('btnImportCard').onclick=()=>$('fileImport').click();
+$('fileImport').onchange=async function(){
+  const file=this.files[0];if(!file)return;
+  const text=await file.text();
+  try{
+    const card=JSON.parse(text);
+    api.openCompanionEditor({...card,id:Date.now().toString(36)});
+  }catch(e){alert('导入失败：'+e.message);}
+  this.value='';
+};
+
+loadCompanions();
 </script>
 </body>
 </html>

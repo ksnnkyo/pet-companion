@@ -1,0 +1,52 @@
+{
+  "dimensions": {
+    "extraversion": { "label": "外向性", "low": "安静内敛", "high": "主动外向", "desc": "话多话少，主动搭话频率" },
+    "sensitivity": { "label": "敏感度", "low": "顿感稳定", "high": "极易波动", "desc": "对外界刺激的情绪反应速度" },
+    "clinginess": { "label": "粘人性", "low": "独立自主", "high": "时刻需要你", "desc": "需要陪伴的程度" },
+    "energy": { "label": "活力值", "low": "慵懒安静", "high": "精力充沛", "desc": "整体活跃度和动画速度" },
+    "expressiveness": { "label": "表达风格", "low": "直接高效", "high": "含蓄婉转", "desc": "说话方式直白还是绕弯" },
+    "sophistication": { "label": "世故度", "low": "天真单纯", "high": "精于洞察", "desc": "对人心的理解和算计程度" },
+    "sapiosexuality": { "label": "智性恋", "low": "颜值/情绪优先", "high": "才华即魅力", "desc": "被智力才华吸引的程度" },
+    "tolerance": { "label": "包容度", "low": "标准高挑剔", "high": "包容宽厚", "desc": "对你错误的容忍程度" },
+    "romanticism": { "label": "浪漫vs务实", "low": "极度浪漫", "high": "务实理性", "desc": "幻想玫瑰还是脚踏实地" },
+    "equanimity": { "label": "豁达vs焦虑", "low": "豁达从容", "high": "容易焦虑", "desc": "心态平稳还是容易担忧" },
+    "attachment": { "label": "依恋型", "low": "安全独立", "high": "焦虑型依恋", "desc": "分离时的情绪反应强度" },
+    "possessiveness": { "label": "占有欲", "low": "佛系随意", "high": "频繁查岗", "desc": "在意你与他人互动的程度" },
+    "libido": { "label": "情欲", "low": "纯治愈向", "high": "欲望旺盛", "desc": "亲密欲望的表达频率" },
+    "dominance": { "label": "性支配欲", "low": "顺从被动", "high": "主动掌控", "desc": "关系中的主导/顺从倾向" },
+    "demandingness": { "label": "索取度", "low": "很少要求", "high": "高需求", "desc": "对你关注和回应的索取程度" },
+    "maternity": { "label": "母性", "low": "讨厌照顾人", "high": "照料碎碎念", "desc": "关心照料你的倾向" }
+  },
+  "presets": {
+    "温柔人妻": {
+      "extraversion": 45, "sensitivity": 70, "clinginess": 50, "energy": 50,
+      "expressiveness": 65, "sophistication": 70, "sapiosexuality": 55, "tolerance": 75,
+      "romanticism": 45, "equanimity": 60, "attachment": 45, "possessiveness": 55,
+      "libido": 50, "dominance": 20, "demandingness": 40, "maternity": 75
+    },
+    "职场御姐": {
+      "extraversion": 70, "sensitivity": 40, "clinginess": 35, "energy": 75,
+      "expressiveness": 30, "sophistication": 85, "sapiosexuality": 90, "tolerance": 40,
+      "romanticism": 75, "equanimity": 45, "attachment": 30, "possessiveness": 60,
+      "libido": 60, "dominance": 75, "demandingness": 50, "maternity": 25
+    },
+    "高需求小娇妻": {
+      "extraversion": 60, "sensitivity": 80, "clinginess": 85, "energy": 55,
+      "expressiveness": 70, "sophistication": 45, "sapiosexuality": 40, "tolerance": 60,
+      "romanticism": 25, "equanimity": 20, "attachment": 90, "possessiveness": 80,
+      "libido": 70, "dominance": 35, "demandingness": 90, "maternity": 55
+    }
+  },
+  "emotionModifiers": {
+    "extraversion": { "wanderProb": 0.3, "greetProb": 0.2, "idleInterval": -0.3 },
+    "sensitivity": { "chainProb": 0.25, "intensityBias": 0.2 },
+    "clinginess": { "approachProb": 0.4, "lonelyDelay": -0.4 },
+    "energy": { "fpsMod": 0.3, "jumpWeight": 0.2, "sleepyWeight": -0.3 },
+    "expressiveness": { "bubbleDuration": 0.5, "dialogueLength": 0.3 },
+    "tolerance": { "angryThreshold": 0.5, "comfortingWeight": 0.3 },
+    "attachment": { "separationSensitivity": 0.5, "reunionExcitement": 0.4 },
+    "possessiveness": { "jealousWeight": 0.5 },
+    "libido": { "flirtyWeight": 0.5, "affectionateWeight": 0.3 },
+    "demandingness": { "proactiveMessage": 0.4, "ignorePenalty": 0.3 }
+  }
+}

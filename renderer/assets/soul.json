@@ -1,0 +1,142 @@
+{
+  "version": "1.0",
+  "emotions": [
+    "shy", "affectionate", "coquettish", "happy", "sad", "angry",
+    "lonely", "excited", "sleepy", "dazed", "curious", "proud",
+    "comforting", "wronged", "surprised"
+  ],
+  "behaviors": ["idle", "walk", "run", "jump", "eat", "sleep", "work", "greet"],
+  "emotionWeights": {
+    "shy": 8, "affectionate": 7, "coquettish": 6, "happy": 10, "sad": 5,
+    "angry": 4, "lonely": 5, "excited": 7, "sleepy": 6, "dazed": 5,
+    "curious": 7, "proud": 6, "comforting": 5, "wronged": 4, "surprised": 5
+  },
+  "dialogues": {
+    "shy": {
+      "mild": ["别...别盯着人家看啦", "这样盯着我，我会害羞的", "嗯...有什么事吗？"],
+      "medium": ["你这样我会脸红的...", "再看我就要躲起来了哦", "哼，不理你了（小声）"],
+      "intense": ["完蛋了完蛋了心跳好快", "用这种眼神看人家...犯规啦", "呜...我要钻进被子里"]
+    },
+    "affectionate": {
+      "mild": ["今天的你也很帅呢~", "想靠近一点...", "嗯...？"],
+      "medium": ["过来，让我靠近一点", "最喜欢你了~", "嘿嘿，可以蹭蹭你吗？"],
+      "intense": ["抱抱！要抱抱！", "不准走！就在这里陪我！", "忍不住了，让我rua一下！"]
+    },
+    "coquettish": {
+      "mild": ["陪我玩一会儿嘛~", "哼...", "人家现在不想动啦"],
+      "medium": ["你不陪我看剧我就闹！", "要喝奶茶！不喝不走！", "哼，不跟你说话了（但没转身）"],
+      "intense": ["就要！现在就要！", "你不哄我我就哭给你看！", "呜...你是不是不爱我了..."]
+    },
+    "happy": {
+      "mild": ["太棒了！今天心情超好！", "有你在真好~", "嘿嘿~"],
+      "medium": ["哇！好开心！", "今天也想和你待在一起呢", "想到你就好开心~"],
+      "intense": ["耶耶耶耶耶！！", "忍不住转圈圈了！", "好幸福！你是世界上最好的人！"]
+    },
+    "sad": {
+      "mild": ["有点不开心...", "嗯...", "没什么，就是有点低落"],
+      "medium": ["可以抱抱我吗...", "心里有点难受", "今天好像什么都不对..."],
+      "intense": ["呜...忍不住了...", "好难过...为什么...", "抱抱我好不好..."]
+    },
+    "angry": {
+      "mild": ["哼！", "有点不高兴...", "哼，不理你了（但没走）"],
+      "medium": ["你故意的对不对！", "真的要生气了哦！", "哼！不想跟你说话！"],
+      "intense": ["走开！我不想见到你！", "再这样我真的要生气了！", "（转身背对，肩膀在抖）"]
+    },
+    "lonely": {
+      "mild": ["嗯...", "有点无聊呢...", "今天好安静..."],
+      "medium": ["可以陪我聊聊天吗...", "有点寂寞...", "你在就好了..."],
+      "intense": ["呜...没人理我...", "为什么没人来找我...", "好孤独..."]
+    },
+    "excited": {
+      "mild": ["哇！真的吗！", "眼睛亮了！", "好有趣！"],
+      "medium": ["真的吗！！好棒！！", "我要！这个我要！", "等等等等太让人激动了！"],
+      "intense": ["啊啊啊啊啊啊啊！！！", "转圈圈转圈圈转圈圈！！", "太棒了！！！我要飞了！！！"]
+    },
+    "sleepy": {
+      "mild": ["有点困了呢...", "嗯...想睡了...", "哈欠..."],
+      "medium": ["让我靠一会儿...", "眼睛睁不开了...", "再陪我一会儿嘛..."],
+      "intense": ["zzZ...zzZ...", "我已经神志不清了...", "抱我回房间好不好..."]
+    },
+    "dazed": {
+      "mild": ["嗯？...啊？什么？", "在想事情...", "稍等，在放空中..."],
+      "medium": ["窗外云好好看...", "嗯...我在想...", "（发呆中）"],
+      "intense": ["我在想一个很重要的事情...", "（灵魂出窍中）", "世界好安静..."]
+    },
+    "curious": {
+      "mild": ["嗯？这是什么？", "让我看看...", "好有趣~"],
+      "medium": ["这个能让我看看吗？", "好想研究一下！", "诶？真的吗？"],
+      "intense": ["什么什么！！快告诉我！", "我要！我要看！我要研究！", "等等让我凑近点！"]
+    },
+    "proud": {
+      "mild": ["嘿嘿~", "还不错吧~", "有没有很厉害~"],
+      "medium": ["哼哼~我是不是很棒！", "看吧看吧！我说对了吧！", "不错吧！崇拜我吧！"],
+      "intense": ["哈！我就知道！", "不得不说我就！是！天才！", "快夸我！快夸我！"]
+    },
+    "comforting": {
+      "mild": ["没事的没事的~", "我在哦~", "别担心~"],
+      "medium": ["来，深呼吸~", "有我在呢~", "不管怎样我都在~"],
+      "intense": ["乖...我在呢...", "抱抱...什么都会好的...", "你不是一个人...我在..."]
+    },
+    "wronged": {
+      "mild": ["呜...", "不是我的错啦...", "我好可怜..."],
+      "medium": ["为什么不相信我...", "明明不是我的问题...", "好委屈..."],
+      "intense": ["呜...呜呜...", "你欺负我...", "我再也不相信你了..."]
+    },
+    "surprised": {
+      "mild": ["诶？", "真的吗？", "哇..."],
+      "medium": ["什么！！", "不会吧！！", "等等等等！！"],
+      "intense": ["！！！！！", "这这这这这！！！", "天哪！！！（跳起）"]
+    }
+  },
+  "animations": {
+    "idle":  { "frames": 4, "fps": 7,  "loop": true },
+    "walk":  { "frames": 4, "fps": 10, "loop": true },
+    "run":   { "frames": 4, "fps": 14, "loop": true },
+    "jump":  { "frames": 3, "fps": 10, "loop": false },
+    "sleep": { "frames": 2, "fps": 4,  "loop": true },
+    "eat":   { "frames": 2, "fps": 6,  "loop": true },
+    "work":  { "frames": 3, "fps": 6,  "loop": true },
+    "greet": { "frames": 2, "fps": 8,  "loop": true }
+  },
+  "emotionAnimationFrames": {
+    "shy":         { "mild": 2, "medium": 3, "intense": 3 },
+    "affectionate": { "mild": 2, "medium": 3, "intense": 3 },
+    "coquettish":  { "mild": 2, "medium": 3, "intense": 3 },
+    "happy":       { "mild": 2, "medium": 3, "intense": 4 },
+    "sad":         { "mild": 2, "medium": 2, "intense": 3 },
+    "angry":       { "mild": 2, "medium": 3, "intense": 3 },
+    "lonely":      { "mild": 2, "medium": 2, "intense": 3 },
+    "excited":     { "mild": 2, "medium": 3, "intense": 4 },
+    "sleepy":      { "mild": 2, "medium": 2, "intense": 2 },
+    "dazed":       { "mild": 2, "medium": 2, "intense": 2 },
+    "curious":     { "mild": 2, "medium": 3, "intense": 3 },
+    "proud":       { "mild": 2, "medium": 3, "intense": 3 },
+    "comforting":  { "mild": 2, "medium": 2, "intense": 3 },
+    "wronged":     { "mild": 2, "medium": 3, "intense": 3 },
+    "surprised":   { "mild": 2, "medium": 3, "intense": 4 }
+  },
+  "movement": {
+    "idleDurationMinMs": 8000,
+    "idleDurationMaxMs": 20000,
+    "wanderDistanceMinPx": 60,
+    "wanderDistanceMaxPx": 250,
+    "moveSpeedPxPerSec": 80,
+    "wanderProbability": 0.40,
+    "stepIntervalMs": 50
+  },
+  "soundEffects": {
+    "happy":      { "type": "chime", "frequencies": [660, 880], "duration": 0.25, "gain": 0.25 },
+    "excited":    { "type": "ascending", "frequencies": [440, 660, 880], "duration": 0.3, "gain": 0.3 },
+    "sad":        { "type": "sigh", "frequencies": [280, 220], "duration": 0.5, "gain": 0.2 },
+    "angry":      { "type": "buzz", "frequencies": [220, 180], "duration": 0.3, "gain": 0.15 },
+    "surprised":  { "type": "pop", "frequencies": [1000, 1400], "duration": 0.12, "gain": 0.3 },
+    "affectionate": { "type": "chime", "frequencies": [520, 660], "duration": 0.35, "gain": 0.2 },
+    "curious":    { "type": "pop", "frequencies": [600, 800], "duration": 0.15, "gain": 0.2 },
+    "proud":      { "type": "ascending", "frequencies": [330, 520, 780], "duration": 0.4, "gain": 0.25 },
+    "lonely":     { "type": "sigh", "frequencies": [300, 220], "duration": 0.6, "gain": 0.15 },
+    "sleepy":     { "type": "sigh", "frequencies": [260, 200], "duration": 0.7, "gain": 0.15 }
+  },
+  "bubbleDurationMsPerChar": 80,
+  "bubbleDurationMinMs": 3000,
+  "bubbleDurationMaxMs": 8000
+}

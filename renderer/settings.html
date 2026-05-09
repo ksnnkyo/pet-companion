@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>小伴 · 设置</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC',sans-serif;background:#f5f2ee;height:100vh;display:flex;flex-direction:column;user-select:none;overflow:hidden}
+.tabs{display:flex;background:#d46a78;color:#fff;font-size:12px;-webkit-app-region:drag}
+.tab{padding:8px 14px;cursor:pointer;opacity:0.65;border-bottom:2px solid transparent;-webkit-app-region:no-drag}
+.tab.active{opacity:1;border-bottom-color:#fff;font-weight:600}
+.tab:hover{opacity:0.9}
+.panel{flex:1;overflow-y:auto;display:none;padding:12px}
+.panel.active{display:block}
+.section{margin-bottom:16px}
+.section h3{font-size:13px;color:#666;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid#e0dcd6}
+label{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;font-size:12px;color:#555}
+label input,label select,label textarea{padding:6px 8px;border:1px solid#d0ccc6;border-radius:6px;font-size:12px;outline:none}
+label input:focus,label select:focus,label textarea:focus{border-color:#d46a78}
+label textarea{resize:vertical;min-height:40px}
+button{font-size:12px;padding:6px 12px;border:none;border-radius:6px;cursor:pointer}
+.btn-primary{background:#d46a78;color:#fff}.btn-secondary{background:#e0dcd6;color:#333}.btn-danger{background:#c44;color:#fff}.btn-sm{padding:3px 8px;font-size:11px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.slider-row{display:flex;flex-direction:column;gap:2px;margin-bottom:4px}
+.slider-row>span{display:flex;justify-content:space-between;font-size:11px}
+.slider-row small{color:#d46a78;font-weight:600}
+.slider-wrap{display:flex;align-items:center;gap:4px}
+.slider-wrap input[type=range]{flex:1}
+.slider-low,.slider-high{font-size:10px;color:#aaa;min-width:28px}
+.slider-low{text-align:right}.slider-high{text-align:left}
+.memory-item{display:flex;justify-content:space-between;align-items:start;padding:8px;background:#fff;border-radius:8px;margin-bottom:4px;gap:8px}
+.memory-item .keys{font-size:10px;color:#d46a78;margin-bottom:2px}
+.memory-item .content{font-size:12px;color:#333}
+.memory-item .actions{display:flex;gap:4px;flex-shrink:0}
+.var-bar{margin-bottom:8px}
+.var-bar .label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.var-bar .track{height:6px;background:#e0dcd6;border-radius:3px;overflow:hidden}
+.var-bar .fill{height:100%;border-radius:3px;transition:width 0.5s}
+.var-history{font-size:11px;color:#888;max-height:200px;overflow-y:auto}
+</style>
+</head>
+<body>
+<div class="tabs">
+  <div class="tab active" data-panel="personality">🎭 人格</div>
+  <div class="tab" data-panel="memory">🧠 记忆</div>
+  <div class="tab" data-panel="variables">📊 变量</div>
+  <div class="tab" data-panel="llm">🔌 LLM</div>
+  <div class="tab" data-panel="pet">🐾 宠物</div>
+</div>
+
+<!-- 人格 -->
+<div class="panel active" id="panel-personality">
+  <div class="section">
+    <h3>预设</h3>
+    <select id="presetSelect">
+      <option value="">自定义</option>
+      <option value="温柔人妻">温柔人妻</option>
+      <option value="职场御姐">职场御姐</option>
+      <option value="高需求小娇妻">高需求小娇妻</option>
+    </select>
+  </div>
+  <div class="section"><h3>16 维度调节</h3><div id="sliders"></div></div>
+</div>
+
+<!-- 记忆 -->
+<div class="panel" id="panel-memory">
+  <div class="section">
+    <h3>World Info 词条记忆</h3>
+    <p style="font-size:11px;color:#888;margin-bottom:8px">LLM 自动从对话中提取记忆，或手动添加。对话命中关键词时自动注入上下文。</p>
+    <div class="row" style="margin-bottom:8px">
+      <label style="flex:1">关键词<input id="memKeys" placeholder="猫,咪咪"></label>
+      <label style="flex:2">内容<input id="memContent" placeholder="用户养了一只猫"></label>
+    </div>
+    <button class="btn-primary" id="memAdd">添加词条</button>
+    <label style="margin-top:8px"><input type="checkbox" id="memAuto" checked> LLM 自动提取记忆</label>
+  </div>
+  <div class="section"><h3>已存词条 (<span id="memCount">0</span>)</h3><div id="memList"></div></div>
+</div>
+
+<!-- 变量 -->
+<div class="panel" id="panel-variables">
+  <div class="section"><h3>关系变量</h3><div id="varBars"></div></div>
+  <div class="section"><h3>变动记录</h3><div class="var-history" id="varHistory"></div></div>
+</div>
+
+<!-- LLM -->
+<div class="panel" id="panel-llm">
+  <div class="section">
+    <h3>AI 后端</h3>
+    <label>提供商<select id="llmProvider">
+      <option value="openai">OpenAI 兼容</option>
+      <option value="ollama">Ollama 本地</option>
+      <option value="anthropic">Anthropic Claude</option>
+      <option value="deepseek">DeepSeek</option>
+    </select></label>
+    <label>Base URL<input id="baseURL" placeholder="https://api.openai.com/v1"></label>
+    <label>模型<input id="model" placeholder="gpt-4o-mini"></label>
+    <label>API Key<input id="apiKey" type="password" placeholder="留空则本地模式"></label>
+    <label>Temperature<input id="temperature" type="range" min="0" max="2" step="0.1" value="0.8"><small id="tempVal">0.8</small></label>
+  </div>
+  <div class="section">
+    <h3>情绪引擎</h3>
+    <label>思考间隔（秒）<input id="thinkInterval" type="number" min="5" max="120" value="15"></label>
+  </div>
+</div>
+
+<!-- 宠物 -->
+<div class="panel" id="panel-pet">
+  <div class="section">
+    <h3>基本信息</h3>
+    <label>名字<input id="petName" placeholder="小伴"></label>
+    <label>基调<input id="petTone" placeholder="温暖治愈"></label>
+    <label>外观描述<textarea id="petAppearance" rows="3" placeholder="温柔知性的女性形象..."></textarea></label>
+    <label>人格描述<textarea id="petPersonality" rows="3" placeholder="细腻、会主动关心用户..."></textarea></label>
+  </div>
+</div>
+
+<script>
+const api = window.electronAPI;
+const $ = id => document.getElementById(id);
+
+// Tab
+document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');$('panel-'+t.dataset.panel).classList.add('active');
+};});
+
+// ===== 人格 =====
+const dims=['extraversion','sensitivity','clinginess','energy','expressiveness','sophistication','sapiosexuality','tolerance','romanticism','equanimity','attachment','possessiveness','libido','dominance','demandingness','maternity'];
+const dimLabels={extraversion:'外向性',sensitivity:'敏感度',clinginess:'粘人性',energy:'活力值',expressiveness:'表达风格',sophistication:'世故度',sapiosexuality:'智性恋',tolerance:'包容度',romanticism:'浪漫vs务实',equanimity:'豁达vs焦虑',attachment:'依恋型',possessiveness:'占有欲',libido:'情欲',dominance:'支配欲',demandingness:'索取度',maternity:'母性'};
+const dimLows={extraversion:'安静',sensitivity:'顿感',clinginess:'独立',energy:'慵懒',expressiveness:'直接',sophistication:'天真',sapiosexuality:'颜值优先',tolerance:'挑剔',romanticism:'浪漫',equanimity:'豁达',attachment:'安全',possessiveness:'佛系',libido:'纯治愈',dominance:'顺从',demandingness:'不提要求',maternity:'讨厌照顾'};
+const dimHighs={extraversion:'主动',sensitivity:'敏感',clinginess:'粘人',energy:'精力旺盛',expressiveness:'含蓄',sophistication:'洞察',sapiosexuality:'才华控',tolerance:'包容',romanticism:'务实',equanimity:'焦虑',attachment:'焦虑型',possessiveness:'占有欲强',libido:'欲望强',dominance:'掌控',demandingness:'高需求',maternity:'照料狂'};
+let personality={}; dims.forEach(d=>personality[d]=50);
+
+function buildSliders(){
+  $('sliders').innerHTML=dims.map(d=>`
+    <div class="slider-row"><span>${dimLabels[d]} <small>${personality[d]}</small></span>
+    <div class="slider-wrap"><span class="slider-low">${dimLows[d]}</span>
+    <input type="range" min="0" max="100" value="${personality[d]}" data-dim="${d}">
+    <span class="slider-high">${dimHighs[d]}</span></div></div>
+  `).join('');
+  document.querySelectorAll('#sliders input').forEach(s=>{s.oninput=()=>{personality[s.dataset.dim]=parseInt(s.value);s.parentElement.parentElement.querySelector('small').textContent=s.value;$('presetSelect').value='';savePersonality();};});
+}
+async function loadPersonality(){const s=await api.getConfig('personality');if(s?.dimensions)Object.assign(personality,s.dimensions);buildSliders();}
+function savePersonality(){api.setConfig('personality',{dimensions:personality,name:$('petName').value||'小伴',tone:$('petTone').value||'温暖治愈'});}
+$('presetSelect').onchange=async()=>{
+  const v=$('presetSelect').value; if(!v)return;
+  const r=await fetch('http://localhost:5173/assets/personality.json');
+  if(r.ok){const d=await r.json();if(d.presets[v]){Object.assign(personality,d.presets[v]);savePersonality();buildSliders();}}
+};
+loadPersonality();
+
+// ===== 记忆 =====
+let memories=[],memAuto=true;
+async function loadMem(){const s=await api.getConfig('memories');if(s?.entries)memories=s.entries;if(s?.autoExtract!==undefined)memAuto=s.autoExtract;$('memAuto').checked=memAuto;renderMem();}
+async function saveMem(){await api.setConfig('memories',{entries:memories,autoExtract:memAuto});}
+function renderMem(){$('memCount').textContent=memories.length;$('memList').innerHTML=memories.map(m=>`<div class="memory-item"><div><div class="keys">${m.keys.join(', ')}</div><div class="content">${m.content}</div></div><div class="actions"><button class="btn-danger btn-sm" data-id="${m.id}">删除</button></div></div>`).join('')||'<div style="color:#aaa;font-size:12px">暂无词条</div>';
+document.querySelectorAll('#memList .btn-danger').forEach(b=>b.onclick=()=>{memories=memories.filter(m=>m.id!==b.dataset.id);saveMem();renderMem();});}
+$('memAdd').onclick=()=>{
+  const keys=$('memKeys').value.split(',').map(k=>k.trim()).filter(Boolean);
+  const content=$('memContent').value.trim();
+  if(!keys.length||!content)return;
+  memories.push({id:Date.now().toString(36),keys,content,createdAt:Date.now(),updatedAt:Date.now(),source:'manual'});
+  saveMem();renderMem();$('memKeys').value='';$('memContent').value='';
+};
+$('memAuto').onchange=()=>{memAuto=$('memAuto').checked;saveMem();};
+loadMem();
+
+// ===== 变量 =====
+let variables={affection:50,trust:50,familiarity:30,energy:70,mood:60},varHistory=[];
+const varColors={affection:'#e87080',trust:'#5b9bd5',familiarity:'#6ba58b',energy:'#e8a050',mood:'#a080d0'};
+const varNames={affection:'好感度',trust:'信任度',familiarity:'熟悉度',energy:'精力',mood:'心情'};
+async function loadVars(){const s=await api.getConfig('variables');if(s?.values)Object.assign(variables,s.values);if(s?.history)varHistory=s.history.slice(-50);renderVars();}
+function renderVars(){
+  $('varBars').innerHTML=Object.entries(variables).map(([k,v])=>`<div class="var-bar"><div class="label"><span>${varNames[k]||k}</span><span>${v}/100</span></div><div class="track"><div class="fill" style="width:${v}%;background:${varColors[k]||'#888'}"></div></div></div>`).join('');
+  $('varHistory').innerHTML=varHistory.slice(-30).reverse().map(h=>{const d=new Date(h.time);return`<div>${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} ${varNames[h.var]||h.var} ${h.delta>0?'+'+h.delta:h.delta} ${h.reason||''}</div>`;}).join('');
+}
+loadVars();
+
+// ===== LLM =====
+let config={baseURL:'https://api.openai.com/v1',model:'gpt-4o-mini',apiKey:'',temperature:0.8,maxTokens:200,provider:'openai'};
+let thinkInterval=15;
+async function loadLLM(){const c=await api.getConfig('agentConfig');if(c)Object.assign(config,c);$('baseURL').value=config.baseURL||'';$('model').value=config.model||'';$('apiKey').value=config.apiKey||'';$('llmProvider').value=config.provider||'openai';$('temperature').value=config.temperature||0.8;$('tempVal').textContent=config.temperature||0.8;const ti=await api.getConfig('thinkInterval');if(ti)thinkInterval=ti;$('thinkInterval').value=thinkInterval;}
+function saveLLM(){config.baseURL=$('baseURL').value;config.model=$('model').value;config.apiKey=$('apiKey').value;config.provider=$('llmProvider').value;config.temperature=parseFloat($('temperature').value);api.setConfig('agentConfig',config);}
+$('llmProvider').onchange=function(){
+  const v=this.value;
+  if(v==='ollama'){$('baseURL').value='http://localhost:11434/v1';$('model').value='llama3.2';}
+  else if(v==='anthropic'){$('baseURL').value='https://api.anthropic.com/v1';$('model').value='claude-sonnet-4-20250514';}
+  else if(v==='deepseek'){$('baseURL').value='https://api.deepseek.com/v1';$('model').value='deepseek-chat';}
+  else{$('baseURL').value='https://api.openai.com/v1';$('model').value='gpt-4o-mini';}
+  saveLLM();
+};
+['baseURL','model','apiKey'].forEach(id=>$(id).addEventListener('change',saveLLM));
+$('temperature').oninput=function(){$('tempVal').textContent=this.value;saveLLM();};
+$('thinkInterval').onchange=function(){thinkInterval=parseInt(this.value)||15;api.setConfig('thinkInterval',thinkInterval);};
+loadLLM();
+
+// ===== 宠物 =====
+let profile={name:'小伴',tone:'温暖治愈',appearance:'温柔知性',personality:'细腻会关心人'};
+function loadPet(){const p=api.getConfig('petProfile').then(p=>{if(p)Object.assign(profile,p);$('petName').value=profile.name;$('petTone').value=profile.tone;$('petAppearance').value=profile.appearance;$('petPersonality').value=profile.personality;});}
+function savePet(){profile.name=$('petName').value;profile.tone=$('petTone').value;profile.appearance=$('petAppearance').value;profile.personality=$('petPersonality').value;api.setConfig('petProfile',profile);}
+['petName','petTone','petAppearance','petPersonality'].forEach(id=>$(id).addEventListener('change',savePet));
+loadPet();
+</script>
+</body>
+</html>

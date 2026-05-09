@@ -1,0 +1,44 @@
+{
+  "name": "pet-companion",
+  "version": "1.1",
+  "description": "AI Desktop Pet Companion — 情感交互桌面宠物智能体 Skill。可跟随 Agent 运行状态调整情绪，支持双向实时通信。",
+  "author": "PetCompanion",
+  "type": "daemon",
+  "platform": ["macos"],
+  "start": {
+    "command": "npm run start",
+    "cwd": "."
+  },
+  "health": "http://127.0.0.1:9876/health",
+  "manifest": "http://127.0.0.1:9876/manifest",
+  "tools": "http://127.0.0.1:9876/tools",
+  "ws": "ws://127.0.0.1:9876",
+  "config": {
+    "agentWebhook": "http://127.0.0.1:9876/config",
+    "agentStatusUrl": ""
+  },
+  "autoStart": false,
+  "restartOnCrash": true,
+  "capabilities": [
+    "emotion", "dialogue", "notification", "movement",
+    "agent-state-subscribe", "webhook-callback", "llm-proxy"
+  ],
+  "emotions": [
+    "shy", "affectionate", "coquettish", "happy", "sad", "angry",
+    "lonely", "excited", "sleepy", "dazed", "curious", "proud",
+    "comforting", "wronged", "surprised"
+  ],
+  "intensities": ["mild", "medium", "intense"],
+  "integration": {
+    "hermes": {
+      "autoRegister": true,
+      "registerEndpoint": "http://127.0.0.1:9876/skills/register",
+      "events": ["task.started", "task.completed", "task.error", "thinking.start", "thinking.end"]
+    },
+    "openClaw": {
+      "autoRegister": true,
+      "registerEndpoint": "http://127.0.0.1:9876/skills/register",
+      "events": ["agent:task", "agent:thinking", "agent:done", "agent:error"]
+    }
+  }
+}
